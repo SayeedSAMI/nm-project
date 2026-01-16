@@ -1,125 +1,143 @@
 :root {
-    --bg: #0f172a;
-    --panel: #020617;
-    --text: #e5e7eb;
-    --accent: #38bdf8;
+  --bg: #280030;
+  --panel: #1a0625;
+  --text: #ba6cfe;
+  --accent: #7e3ef3;
+    /* --bg: #0f172a;
+  --panel: #020617;
+  --text: #e5e7eb;
+  --accent: #38bdf8; */
 }
 
 body {
-    font-family: Arial, sans-serif;
-    background: var(--bg);
-    color: var(--text);
-    margin: 0;
-    padding: 0;
+  font-family: Arial, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  margin: 0;
+  padding: 0;
 }
 
 body.light {
-    --bg: #f8fafc;
-    --panel: #ffffff;
-    --text: #111827;
-    --accent: #3b82f6;
+  --bg: #f8fafc;
+  --panel: #ffffff;
+  --text: #111827;
+  --accent: #3b82f6;
 }
 
 header {
-    background: var(--panel);
-    padding: 15px;
-    text-align: center;
-    font-size: 24px;
-    font-weight: bold;
-    border-bottom: 2px solid var(--accent);
+  background: var(--panel);
+  padding: 15px;
+  text-align: center;
+  font-size: 24px;
+  font-weight: bold;
+  border-bottom: 2px solid var(--accent);
 }
 
 .container {
-    display: grid;
-    grid-template-columns: 350px 1fr;
-    gap: 15px;
-    padding: 15px;
+  /* width: 1500px; */
+  display: grid;
+  grid-template-columns: 350px 1fr;
+  gap: 85px;
+  padding: 15px;
 }
 
-.panel {
-    background: var(--panel);
-    padding: 15px;
-    border-radius: 10px;
-    box-shadow: 0 0 15px rgba(56,189,248,0.2);
+.panel1 {
+  width: 340px;
+  background: var(--panel);
+  padding: 45px;
+  border-radius: 10px;
+  box-shadow: 0 0 15px rgba(56,189,248,0.2);
+  /* box-shadow: 0 0 15px rgba(245, 240, 240, 0.2); */
+}
+.panel2 {
+  /* width: 700px; */
+  background: var(--panel);
+  padding: 15px;
+  border-radius: 10px;
+  box-shadow: 0 0 15px rgba(56, 189, 248, 0.2);
 }
 
-.panel h2 {
-    margin-top: 0;
-    color: var(--accent);
-    border-bottom: 1px solid #334155;
-    padding-bottom: 6px;
+.panel1 h2,
+.panel2 h2 {
+  margin-top: 0;
+  color: var(--accent);
+  border-bottom: 1px solid #334155;
+  padding-bottom: 6px;
 }
 
 label {
-    display: block;
-    margin-top: 10px;
-    font-size: 14px;
+  display: block;
+  margin-top: 10px;
+  font-size: 14px;
 }
 
-input, select, button {
-    width: 100%;
-    padding: 8px;
-    margin-top: 5px;
-    border-radius: 6px;
-    border: none;
-    outline: none;
-    font-size: 14px;
+input,
+select,
+button {
+  width: 100%;
+  padding: 8px;
+  margin-top: 5px;
+  border-radius: 6px;
+  border: none;
+  outline: none;
+  font-size: 14px;
 }
 
-input, select {
-    background: var(--panel);
-    color: var(--text);
-    border: 1px solid #334155;
+input,
+select {
+  background: var(--panel);
+  color: var(--text);
+  border: 1px solid #334155;
 }
 
 button {
-    background: var(--accent);
-    color: var(--panel);
-    cursor: pointer;
-    margin-top: 15px;
-    font-weight: bold;
+  background: var(--accent);
+  color: var(--panel);
+  cursor: pointer;
+  margin-top: 15px;
+  font-weight: bold;
 }
 
 button:hover {
-    background: #0ea5e9;
+  background: #0ea5e9;
 }
 
 canvas {
-    background: var(--panel);
-    border-radius: 10px;
-    border: 1px solid #334155;
-    cursor: grab;
+  background: var(--panel);
+  border-radius: 10px;
+  border: 1px solid #334155;
+  cursor: grab;
 }
 
 .result {
-    margin-top: 15px;
-    background: var(--panel);
-    padding: 10px;
-    border-radius: 8px;
-    border: 1px solid #334155;
-    font-size: 14px;
+  margin-top: 15px;
+  background: var(--panel);
+  padding: 10px;
+  border-radius: 8px;
+  border: 1px solid #334155;
+  font-size: 14px;
 }
 
 .result span {
-    color: var(--accent);
+  color: var(--accent);
 }
 
 .info {
-    font-size: 13px;
-    line-height: 1.6;
-    margin-top: 10px;
+  font-size: 13px;
+  line-height: 1.6;
+  margin-top: 10px;
 }
 
 footer {
-    text-align: center;
-    padding: 10px;
-    background: var(--panel);
-    border-top: 1px solid #334155;
-    font-size: 13px;
+  text-align: center;
+  padding: 10px;
+  background: var(--panel);
+  border-top: 1px solid #334155;
+  font-size: 13px;
 }
 
 .toggle-btn {
-    margin-top: 10px;
-    padding: 6px;
-    font-size: 13px;
+  margin-top: 10px;
+  padding: 6px;
+  font-size: 13px;
 }

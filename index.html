@@ -1,267 +1,328 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-<meta charset="UTF-8">
-<title>Advanced Numerical Differentiation Calculator</title>
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<link rel="stylesheet" href="./CSS/style.css">
-<!-- <style>
+  <head>
+    <meta charset="UTF-8" />
+    <title>Advanced Numerical Differentiation Calculator</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="./CSS/style.css" />
+    <!-- <style>
 
 </style> -->
-</head>
-<body>
+  </head>
+  <body>
+    <header><h2>Numerical Differentiation Calculator</h2></header>
 
-<header>
-    Advanced Numerical Differentiation Calculator
-</header>
-
-<div class="container">
-
-    <!-- LEFT CONTROL PANEL -->
-    <div class="panel">
+    <div class="container">
+      <!-- LEFT CONTROL PANEL -->
+      <div class="panel1">
         <h2>Input Parameters</h2>
 
         <label>Preset Functions</label>
         <select id="presetSelect" onchange="presetFunction(this.value)">
-            <option value="">--Select a Preset--</option>
-            <option value="Math.sin(x)">sin(x)</option>
-            <option value="Math.cos(x)">cos(x)</option>
-            <option value="Math.exp(x)">exp(x)</option>
-            <option value="x*x">x^2</option>
-            <option value="Math.log(x)">ln(x)</option>
+          <option value="">--Select a Preset--</option>
+          <option value="Math.sin(x)">sin(x)</option>
+          <option value="Math.cos(x)">cos(x)</option>
+          <option value="Math.exp(x)">exp(x)</option>
+          <option value="x*x">x^2</option>
+          <option value="Math.log(x)">ln(x)</option>
         </select>
 
         <label>Function f(x)</label>
-        <input type="text" id="functionInput" value="Math.sin(x)">
+        <input type="text" id="functionInput" value="Math.sin(x)" />
 
         <label>Point (x)</label>
-        <input type="number" id="pointInput" value="1">
+        <input type="number" id="pointInput" value="1" />
 
         <label>Step Size (h)</label>
-        <input type="number" id="stepInput" value="0.01" step="0.001">
+        <input type="number" id="stepInput" value="0.01" step="0.001" />
 
         <label>Method</label>
         <select id="methodSelect">
-            <option value="forward">Forward Difference</option>
-            <option value="backward">Backward Difference</option>
-            <option value="central">Central Difference</option>
-            <option value="divided">Divided Difference</option>
+          <option value="forward">Forward Difference</option>
+          <option value="backward">Backward Difference</option>
+          <option value="central">Central Difference</option>
+          <option value="divided">Divided Difference</option>
         </select>
 
         <label>True Derivative</label>
-        <input type="text" id="trueDerivativeInput" placeholder="Optional: e.g., Math.cos(x)">
+        <input
+          type="text"
+          id="trueDerivativeInput"
+          placeholder="Optional: e.g., Math.cos(x)"
+        />
 
         <button onclick="calculate()">Calculate & Visualize</button>
 
-        <button class="toggle-btn" onclick="toggleMode()">Toggle Dark/Light Mode</button>
+        <button class="toggle-btn" onclick="toggleMode()">
+          Toggle Dark/Light Mode
+        </button>
 
         <div class="result">
-            <div>Estimated Derivative: <span id="derivativeResult">-</span></div>
-            <div>True Derivative: <span id="trueResult">-</span></div>
-            <div>Error: <span id="errorResult">-</span></div>
+          <div>Estimated Derivative: <span id="derivativeResult">-</span></div>
+          <div>True Derivative: <span id="trueResult">-</span></div>
+          <div>Error: <span id="errorResult">-</span></div>
         </div>
 
         <div class="info">
-            <h3>Step-by-Step Calculation</h3>
-            <div id="stepCalculation"></div>
+          <h3>Step-by-Step Calculation</h3>
+          <div id="stepCalculation"></div>
         </div>
 
         <div class="info">
-            <h3>Method Explanation</h3>
-            <div id="methodExplanation"></div>
+          <h3>Method Explanation</h3>
+          <div id="methodExplanation"></div>
         </div>
-    </div>
+      </div>
 
-    <!-- RIGHT VISUALIZATION PANEL -->
-    <div class="panel">
+      <!-- RIGHT VISUALIZATION PANEL -->
+      <div class="panel2">
         <h2>Visualization (Zoom & Pan)</h2>
         <canvas id="graphCanvas" width="800" height="500"></canvas>
+      </div>
     </div>
 
-</div>
+    <footer>
+      <p>&copy; all rights reserved by IIUC 2026</p>
+    </footer>
 
-<footer>
-    Educational Numerical Differentiation Tool | Single File Project
-</footer>
+    <script>
+      /* -------------------- Helper Functions -------------------- */
+      function parseFunction(expr) {
+        return new Function("x", "return " + expr);
+      }
 
-<script>
-/* -------------------- Helper Functions -------------------- */
-function parseFunction(expr) {
-    return new Function("x", "return " + expr);
-}
+      function forwardDifference(f, x, h) {
+        return (f(x + h) - f(x)) / h;
+      }
 
-function forwardDifference(f, x, h) {
-    return (f(x + h) - f(x)) / h;
-}
+      function backwardDifference(f, x, h) {
+        return (f(x) - f(x - h)) / h;
+      }
 
-function backwardDifference(f, x, h) {
-    return (f(x) - f(x - h)) / h;
-}
+      function centralDifference(f, x, h) {
+        return (f(x + h) - f(x - h)) / (2 * h);
+      }
 
-function centralDifference(f, x, h) {
-    return (f(x + h) - f(x - h)) / (2 * h);
-}
+      function dividedDifference(f, x, h) {
+        return (f(x + h) - f(x - h)) / (2 * h);
+      }
 
-function dividedDifference(f, x, h) {
-    return (f(x + h) - f(x - h)) / (2 * h);
-}
+      /* -------------------- Step-by-Step Explanation -------------------- */
+      function getStepCalculation(f, x, h, method) {
+        let steps = "";
+        if (method === "forward") {
+          const f_xh = f(x + h);
+          const f_x = f(x);
+          steps += `f(x+h) = ${f_xh.toFixed(6)}<br>`;
+          steps += `f(x) = ${f_x.toFixed(6)}<br>`;
+          steps += `f'(x) ≈ (f(x+h)-f(x))/h = (${f_xh.toFixed(
+            6
+          )} - ${f_x.toFixed(6)})/${h} = ${(f_xh - f_x) / h}`;
+        }
+        if (method === "backward") {
+          const f_x = f(x);
+          const f_xh = f(x - h);
+          steps += `f(x) = ${f_x.toFixed(6)}<br>`;
+          steps += `f(x-h) = ${f_xh.toFixed(6)}<br>`;
+          steps += `f'(x) ≈ (f(x)-f(x-h))/h = (${f_x.toFixed(
+            6
+          )} - ${f_xh.toFixed(6)})/${h} = ${(f_x - f_xh) / h}`;
+        }
+        if (method === "central" || method === "divided") {
+          const f_xh = f(x + h);
+          const f_xh_ = f(x - h);
+          steps += `f(x+h) = ${f_xh.toFixed(6)}<br>`;
+          steps += `f(x-h) = ${f_xh_.toFixed(6)}<br>`;
+          steps += `f'(x) ≈ (f(x+h)-f(x-h))/(2h) = (${f_xh.toFixed(
+            6
+          )} - ${f_xh_.toFixed(6)})/(2*${h}) = ${(f_xh - f_xh_) / (2 * h)}`;
+        }
+        return steps;
+      }
 
-/* -------------------- Step-by-Step Explanation -------------------- */
-function getStepCalculation(f, x, h, method) {
-    let steps = "";
-    if(method==="forward"){
-        const f_xh = f(x+h);
-        const f_x = f(x);
-        steps += `f(x+h) = ${f_xh.toFixed(6)}<br>`;
-        steps += `f(x) = ${f_x.toFixed(6)}<br>`;
-        steps += `f'(x) ≈ (f(x+h)-f(x))/h = (${f_xh.toFixed(6)} - ${f_x.toFixed(6)})/${h} = ${(f_xh-f_x)/h}`;
-    }
-    if(method==="backward"){
-        const f_x = f(x);
-        const f_xh = f(x-h);
-        steps += `f(x) = ${f_x.toFixed(6)}<br>`;
-        steps += `f(x-h) = ${f_xh.toFixed(6)}<br>`;
-        steps += `f'(x) ≈ (f(x)-f(x-h))/h = (${f_x.toFixed(6)} - ${f_xh.toFixed(6)})/${h} = ${(f_x-f_xh)/h}`;
-    }
-    if(method==="central" || method==="divided"){
-        const f_xh = f(x+h);
-        const f_xh_ = f(x-h);
-        steps += `f(x+h) = ${f_xh.toFixed(6)}<br>`;
-        steps += `f(x-h) = ${f_xh_.toFixed(6)}<br>`;
-        steps += `f'(x) ≈ (f(x+h)-f(x-h))/(2h) = (${f_xh.toFixed(6)} - ${f_xh_.toFixed(6)})/(2*${h}) = ${(f_xh-f_xh_)/(2*h)}`;
-    }
-    return steps;
-}
+      /* -------------------- Preset Function Selection -------------------- */
+      function presetFunction(expr) {
+        if (expr) document.getElementById("functionInput").value = expr;
+      }
 
-/* -------------------- Preset Function Selection -------------------- */
-function presetFunction(expr){
-    if(expr) document.getElementById("functionInput").value = expr;
-}
+      /* -------------------- Method Explanation -------------------- */
+      function updateExplanation(method) {
+        const box = document.getElementById("methodExplanation");
+        if (method === "forward")
+          box.innerText = "Forward Difference: f'(x) ≈ [f(x+h) - f(x)] / h";
+        if (method === "backward")
+          box.innerText = "Backward Difference: f'(x) ≈ [f(x) - f(x-h)] / h";
+        if (method === "central")
+          box.innerText =
+            "Central Difference: f'(x) ≈ [f(x+h) - f(x-h)] / (2h)";
+        if (method === "divided")
+          box.innerText =
+            "Divided Difference: Symmetric difference approximation";
+      }
 
-/* -------------------- Method Explanation -------------------- */
-function updateExplanation(method) {
-    const box = document.getElementById("methodExplanation");
-    if (method === "forward") box.innerText = "Forward Difference: f'(x) ≈ [f(x+h) - f(x)] / h";
-    if (method === "backward") box.innerText = "Backward Difference: f'(x) ≈ [f(x) - f(x-h)] / h";
-    if (method === "central") box.innerText = "Central Difference: f'(x) ≈ [f(x+h) - f(x-h)] / (2h)";
-    if (method === "divided") box.innerText = "Divided Difference: Symmetric difference approximation";
-}
+      /* -------------------- Dark/Light Mode -------------------- */
+      function toggleMode() {
+        document.body.classList.toggle("light");
+      }
 
-/* -------------------- Dark/Light Mode -------------------- */
-function toggleMode(){
-    document.body.classList.toggle("light");
-}
+      /* -------------------- Graph with Zoom & Pan -------------------- */
+      let offsetX = 0,
+        offsetY = 0,
+        scale = 50;
+      let isDragging = false,
+        dragStart = { x: 0, y: 0 };
+      const canvas = document.getElementById("graphCanvas");
+      const ctx = canvas.getContext("2d");
 
-/* -------------------- Graph with Zoom & Pan -------------------- */
-let offsetX = 0, offsetY = 0, scale = 50;
-let isDragging = false, dragStart = {x:0,y:0};
-const canvas = document.getElementById("graphCanvas");
-const ctx = canvas.getContext("2d");
+      canvas.addEventListener("mousedown", (e) => {
+        isDragging = true;
+        dragStart = { x: e.offsetX - offsetX, y: e.offsetY - offsetY };
+        canvas.style.cursor = "grabbing";
+      });
+      canvas.addEventListener("mouseup", (e) => {
+        isDragging = false;
+        canvas.style.cursor = "grab";
+      });
+      canvas.addEventListener("mouseleave", (e) => {
+        isDragging = false;
+        canvas.style.cursor = "grab";
+      });
+      canvas.addEventListener("mousemove", (e) => {
+        if (isDragging) {
+          offsetX = e.offsetX - dragStart.x;
+          offsetY = e.offsetY - dragStart.y;
+          drawGraph(currentF, currentX, currentDerivative);
+        }
+      });
+      canvas.addEventListener("wheel", (e) => {
+        e.preventDefault();
+        const zoomFactor = e.deltaY < 0 ? 1.1 : 0.9;
+        scale *= zoomFactor;
+        drawGraph(currentF, currentX, currentDerivative);
+      });
 
-canvas.addEventListener("mousedown",(e)=>{isDragging=true; dragStart={x:e.offsetX-offsetX, y:e.offsetY-offsetY}; canvas.style.cursor="grabbing";});
-canvas.addEventListener("mouseup",(e)=>{isDragging=false; canvas.style.cursor="grab";});
-canvas.addEventListener("mouseleave",(e)=>{isDragging=false; canvas.style.cursor="grab";});
-canvas.addEventListener("mousemove",(e)=>{
-    if(isDragging){offsetX=e.offsetX-dragStart.x; offsetY=e.offsetY-dragStart.y; drawGraph(currentF, currentX, currentDerivative);}
-});
-canvas.addEventListener("wheel",(e)=>{
-    e.preventDefault();
-    const zoomFactor = e.deltaY<0?1.1:0.9;
-    scale *= zoomFactor;
-    drawGraph(currentF, currentX, currentDerivative);
-});
+      /* -------------------- Graph Drawing -------------------- */
+      let currentF = null,
+        currentX = 0,
+        currentDerivative = 0;
+      function drawGraph(f, x0, derivative) {
+        currentF = f;
+        currentX = x0;
+        currentDerivative = derivative;
 
-/* -------------------- Graph Drawing -------------------- */
-let currentF = null, currentX=0, currentDerivative=0;
-function drawGraph(f, x0, derivative){
-    currentF = f; currentX=x0; currentDerivative=derivative;
+        const w = canvas.width;
+        const h = canvas.height;
+        ctx.clearRect(0, 0, w, h);
 
-    const w = canvas.width; const h = canvas.height;
-    ctx.clearRect(0,0,w,h);
+        const originX = w / 2 + offsetX;
+        const originY = h / 2 + offsetY;
 
-    const originX = w/2 + offsetX;
-    const originY = h/2 + offsetY;
-
-    // Grid
-    ctx.strokeStyle = "#334155";
-    ctx.lineWidth = 0.5;
-    for(let i=-w;i<w;i+=scale){ctx.beginPath(); ctx.moveTo(originX+i,0); ctx.lineTo(originX+i,h); ctx.stroke();}
-    for(let i=-h;i<h;i+=scale){ctx.beginPath(); ctx.moveTo(0,originY+i); ctx.lineTo(w,originY+i); ctx.stroke();}
-
-    // Axes
-    ctx.strokeStyle="#38bdf8"; ctx.lineWidth=2;
-    ctx.beginPath(); ctx.moveTo(0,originY); ctx.lineTo(w,originY); ctx.stroke();
-    ctx.beginPath(); ctx.moveTo(originX,0); ctx.lineTo(originX,h); ctx.stroke();
-
-    // Function Graph
-    ctx.strokeStyle="#22c55e"; ctx.lineWidth=2;
-    ctx.beginPath();
-    for(let px=0; px<w; px++){
-        let x = (px-originX)/scale;
-        let y = f(x);
-        let py = originY - y*scale;
-        if(px===0) ctx.moveTo(px,py); else ctx.lineTo(px,py);
-    }
-    ctx.stroke();
-
-    // Tangent Line
-    const y0 = f(x0);
-    ctx.strokeStyle="#facc15"; ctx.lineWidth=2;
-    ctx.beginPath();
-    for(let px=0; px<w; px++){
-        let x = (px-originX)/scale;
-        let y = y0 + derivative*(x-x0);
-        let py = originY - y*scale;
-        if(px===0) ctx.moveTo(px,py); else ctx.lineTo(px,py);
-    }
-    ctx.stroke();
-
-    // Point
-    ctx.fillStyle="#ef4444";
-    ctx.beginPath();
-    ctx.arc(originX+x0*scale, originY - y0*scale,5,0,Math.PI*2);
-    ctx.fill();
-}
-
-/* -------------------- Main Calculation -------------------- */
-function calculate(){
-    try{
-        const expr = document.getElementById("functionInput").value;
-        const x = parseFloat(document.getElementById("pointInput").value);
-        const h = parseFloat(document.getElementById("stepInput").value);
-        const method = document.getElementById("methodSelect").value;
-        const trueDerivExpr = document.getElementById("trueDerivativeInput").value;
-
-        const f = parseFunction(expr);
-        let derivative;
-        if(method==="forward") derivative=forwardDifference(f,x,h);
-        if(method==="backward") derivative=backwardDifference(f,x,h);
-        if(method==="central") derivative=centralDifference(f,x,h);
-        if(method==="divided") derivative=dividedDifference(f,x,h);
-
-        // Step-by-step
-        document.getElementById("stepCalculation").innerHTML = getStepCalculation(f,x,h,method);
-
-        // True derivative comparison
-        let trueVal="-";
-        let error="-";
-        if(trueDerivExpr){
-            const fTrue=parseFunction(trueDerivExpr);
-            trueVal=fTrue(x).toFixed(6);
-            error=Math.abs(derivative-fTrue(x)).toExponential(3);
+        // Grid
+        ctx.strokeStyle = "#334155";
+        ctx.lineWidth = 0.5;
+        for (let i = -w; i < w; i += scale) {
+          ctx.beginPath();
+          ctx.moveTo(originX + i, 0);
+          ctx.lineTo(originX + i, h);
+          ctx.stroke();
+        }
+        for (let i = -h; i < h; i += scale) {
+          ctx.beginPath();
+          ctx.moveTo(0, originY + i);
+          ctx.lineTo(w, originY + i);
+          ctx.stroke();
         }
 
-        document.getElementById("derivativeResult").innerText = derivative.toFixed(6);
-        document.getElementById("trueResult").innerText = trueVal;
-        document.getElementById("errorResult").innerText = error;
+        // Axes
+        ctx.strokeStyle = "#38bdf8";
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.moveTo(0, originY);
+        ctx.lineTo(w, originY);
+        ctx.stroke();
+        ctx.beginPath();
+        ctx.moveTo(originX, 0);
+        ctx.lineTo(originX, h);
+        ctx.stroke();
 
-        updateExplanation(method);
-        drawGraph(f,x,derivative);
-    }catch(e){
-        alert("Invalid function. Use JavaScript syntax like Math.sin(x), x*x, Math.exp(x)");
-    }
-}
-</script>
+        // Function Graph
+        ctx.strokeStyle = "#22c55e";
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        for (let px = 0; px < w; px++) {
+          let x = (px - originX) / scale;
+          let y = f(x);
+          let py = originY - y * scale;
+          if (px === 0) ctx.moveTo(px, py);
+          else ctx.lineTo(px, py);
+        }
+        ctx.stroke();
 
-</body>
+        // Tangent Line
+        const y0 = f(x0);
+        ctx.strokeStyle = "#facc15";
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        for (let px = 0; px < w; px++) {
+          let x = (px - originX) / scale;
+          let y = y0 + derivative * (x - x0);
+          let py = originY - y * scale;
+          if (px === 0) ctx.moveTo(px, py);
+          else ctx.lineTo(px, py);
+        }
+        ctx.stroke();
+
+        // Point
+        ctx.fillStyle = "#ef4444";
+        ctx.beginPath();
+        ctx.arc(originX + x0 * scale, originY - y0 * scale, 5, 0, Math.PI * 2);
+        ctx.fill();
+      }
+
+      /* -------------------- Main Calculation -------------------- */
+      function calculate() {
+        try {
+          const expr = document.getElementById("functionInput").value;
+          const x = parseFloat(document.getElementById("pointInput").value);
+          const h = parseFloat(document.getElementById("stepInput").value);
+          const method = document.getElementById("methodSelect").value;
+          const trueDerivExpr = document.getElementById(
+            "trueDerivativeInput"
+          ).value;
+
+          const f = parseFunction(expr);
+          let derivative;
+          if (method === "forward") derivative = forwardDifference(f, x, h);
+          if (method === "backward") derivative = backwardDifference(f, x, h);
+          if (method === "central") derivative = centralDifference(f, x, h);
+          if (method === "divided") derivative = dividedDifference(f, x, h);
+
+          // Step-by-step
+          document.getElementById("stepCalculation").innerHTML =
+            getStepCalculation(f, x, h, method);
+
+          // True derivative comparison
+          let trueVal = "-";
+          let error = "-";
+          if (trueDerivExpr) {
+            const fTrue = parseFunction(trueDerivExpr);
+            trueVal = fTrue(x).toFixed(6);
+            error = Math.abs(derivative - fTrue(x)).toExponential(3);
+          }
+
+          document.getElementById("derivativeResult").innerText =
+            derivative.toFixed(6);
+          document.getElementById("trueResult").innerText = trueVal;
+          document.getElementById("errorResult").innerText = error;
+
+          updateExplanation(method);
+          drawGraph(f, x, derivative);
+        } catch (e) {
+          alert(
+            "Invalid function. Use JavaScript syntax like Math.sin(x), x*x, Math.exp(x)"
+          );
+        }
+      }
+    </script>
+  </body>
 </html>
