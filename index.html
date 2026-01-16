@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Numerical Differentiation Calculator</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <!--
+    Numerical Differentiation Calculator Project
+    -------------------------------------------
+    A complete single-file web application that allows users to:
+    - Input any mathematical function
+    - Choose numerical differentiation methods
+    - Set evaluation point and step size
+    - Visualize function and tangent slope
+    - Compare accuracy of different methods
+    - See error estimation
+    - Learn theory through built-in explanations
+
+    HOW TO RUN:
+    -----------
+    1. Save this file as: index.html
+    2. Open with any modern browser (Chrome, Edge, Firefox)
+    3. No server or internet required
+    -->
+
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        background: #0f172a;
+        color: #e5e7eb;
+        margin: 0;
+        padding: 0;
+      }
+
+      header {
+        background: #020617;
+        padding: 15px;
+        text-align: center;
+        font-size: 24px;
+        font-weight: bold;
+        border-bottom: 2px solid #38bdf8;
+      }
+
+      .container {
+        display: grid;
+        grid-template-columns: 350px 1fr;
+        gap: 15px;
+        padding: 15px;
+      }
+
+      .panel {
+        background: #020617;
+        padding: 15px;
+        border-radius: 10px;
+        box-shadow: 0 0 15px rgba(56, 189, 248, 0.2);
+      }
+
+      .panel h2 {
+        margin-top: 0;
+        color: #38bdf8;
+        border-bottom: 1px solid #334155;
+        padding-bottom: 6px;
+      }
+
+      label {
+        display: block;
+        margin-top: 10px;
+        font-size: 14px;
+      }
+
+      input,
+      select,
+      button {
+        width: 100%;
+        padding: 8px;
+        margin-top: 5px;
+        border-radius: 6px;
+        border: none;
+        outline: none;
+        font-size: 14px;
+      }
+
+      input,
+      select {
+        background: #020617;
+        color: #e5e7eb;
+        border: 1px solid #334155;
+      }
+
+      button {
+        background: #38bdf8;
+        color: #020617;
+        cursor: pointer;
+        margin-top: 15px;
+        font-weight: bold;
+      }
+
+      button:hover {
+        background: #0ea5e9;
+      }
+
+      canvas {
+        background: #020617;
+        border-radius: 10px;
+        border: 1px solid #334155;
+      }
+
+      .result {
+        margin-top: 15px;
+        background: #020617;
+        padding: 10px;
+        border-radius: 8px;
+        border: 1px solid #334155;
+      }
+
+      .result span {
+        color: #38bdf8;
+      }
+
+      .info {
+        font-size: 13px;
+        line-height: 1.6;
+        margin-top: 10px;
+      }
+
+      footer {
+        text-align: center;
+        padding: 10px;
+        background: #020617;
+        border-top: 1px solid #334155;
+        font-size: 13px;
+      }
+    </style>
+  </head>
+
+  <body>
+    <header>Numerical Differentiation Calculator</header>
+
+    <div class="container">
+      <!-- LEFT CONTROL PANEL -->
+      <div class="panel">
+        <h2>Input Parameters</h2>
+
+        <label>Function f(x)</label>
+        <input type="text" id="functionInput" value="Math.sin(x)" />
+
+        <label>Point (x)</label>
+        <input type="number" id="pointInput" value="1" />
+
+        <label>Step Size (h)</label>
+        <input type="number" id="stepInput" value="0.01" step="0.001" />
+
+        <label>Method</label>
+        <select id="methodSelect">
+          <option value="forward">Forward Difference</option>
+          <option value="backward">Backward Difference</option>
+          <option value="central">Central Difference</option>
+          <option value="divided">Divided Difference</option>
+        </select>
+
+        <button onclick="calculate()">Calculate & Visualize</button>
+
+        <div class="result">
+          <div>Estimated Derivative: <span id="derivativeResult">-</span></div>
+          <div>Approx Error: <span id="errorResult">-</span></div>
+        </div>
+
+        <div class="info">
+          <h3>Method Explanation</h3>
+          <div id="methodExplanation"></div>
+        </div>
+      </div>
+
+      <!-- RIGHT VISUALIZATION PANEL -->
+      <div class="panel">
+        <h2>Visualization</h2>
+        <canvas id="graphCanvas" width="800" height="500"></canvas>
+      </div>
+    </div>
+
+    <footer>
+      Educational Numerical Differentiation Tool | Single File Project
+    </footer>
+
+    <script>
+      function parseFunction(expr) {
+        return new Function("x", "return " + expr);
+      }
+
+      function forwardDifference(f, x, h) {
+        return (f(x + h) - f(x)) / h;
+      }
+
+      function backwardDifference(f, x, h) {
+        return (f(x) - f(x - h)) / h;
+      }
+
+      function centralDifference(f, x, h) {
+        return (f(x + h) - f(x - h)) / (2 * h);
+      }
+
+      function dividedDifference(f, x, h) {
+        return (f(x + h) - f(x - h)) / (2 * h);
+      }
+
+      function drawGraph(f, x0, derivative) {
+        const canvas = document.getElementById("graphCanvas");
+        const ctx = canvas.getContext("2d");
+
+        const w = canvas.width;
+        const h = canvas.height;
+
+        ctx.clearRect(0, 0, w, h);
+
+        const scaleX = 50;
+        const scaleY = 50;
+        const originX = w / 2;
+        const originY = h / 2;
+
+        ctx.strokeStyle = "#1e293b";
+        for (let i = 0; i < w; i += scaleX) {
+          ctx.beginPath();
+          ctx.moveTo(i, 0);
+          ctx.lineTo(i, h);
+          ctx.stroke();
+        }
+        for (let i = 0; i < h; i += scaleY) {
+          ctx.beginPath();
+          ctx.moveTo(0, i);
+          ctx.lineTo(w, i);
+          ctx.stroke();
+        }
+
+        ctx.strokeStyle = "#38bdf8";
+        ctx.beginPath();
+        ctx.moveTo(0, originY);
+        ctx.lineTo(w, originY);
+        ctx.stroke();
+
+        ctx.beginPath();
+        ctx.moveTo(originX, 0);
+        ctx.lineTo(originX, h);
+        ctx.stroke();
+
+        ctx.strokeStyle = "#22c55e";
+        ctx.beginPath();
+
+        for (let px = 0; px < w; px++) {
+          let x = (px - originX) / scaleX;
+          let y = f(x);
+          let py = originY - y * scaleY;
+
+          if (px === 0) ctx.moveTo(px, py);
+          else ctx.lineTo(px, py);
+        }
+        ctx.stroke();
+
+        const y0 = f(x0);
+        ctx.strokeStyle = "#facc15";
+        ctx.beginPath();
+
+        for (let px = 0; px < w; px++) {
+          let x = (px - originX) / scaleX;
+          let y = y0 + derivative * (x - x0);
+          let py = originY - y * scaleY;
+
+          if (px === 0) ctx.moveTo(px, py);
+          else ctx.lineTo(px, py);
+        }
+        ctx.stroke();
+
+        ctx.fillStyle = "#ef4444";
+        ctx.beginPath();
+        ctx.arc(
+          originX + x0 * scaleX,
+          originY - y0 * scaleY,
+          5,
+          0,
+          Math.PI * 2
+        );
+        ctx.fill();
+      }
+
+      function calculate() {
+        try {
+          const expr = document.getElementById("functionInput").value;
+          const x = parseFloat(document.getElementById("pointInput").value);
+          const h = parseFloat(document.getElementById("stepInput").value);
+          const method = document.getElementById("methodSelect").value;
+
+          const f = parseFunction(expr);
+
+          let derivative;
+          if (method === "forward") derivative = forwardDifference(f, x, h);
+          if (method === "backward") derivative = backwardDifference(f, x, h);
+          if (method === "central") derivative = centralDifference(f, x, h);
+          if (method === "divided") derivative = dividedDifference(f, x, h);
+
+          let derivative2;
+          if (method === "forward")
+            derivative2 = forwardDifference(f, x, h / 2);
+          if (method === "backward")
+            derivative2 = backwardDifference(f, x, h / 2);
+          if (method === "central")
+            derivative2 = centralDifference(f, x, h / 2);
+          if (method === "divided")
+            derivative2 = dividedDifference(f, x, h / 2);
+
+          const error = Math.abs(derivative - derivative2);
+
+          document.getElementById("derivativeResult").innerText =
+            derivative.toFixed(6);
+          document.getElementById("errorResult").innerText =
+            error.toExponential(3);
+
+          drawGraph(f, x, derivative);
+          updateExplanation(method);
+        } catch (e) {
+          alert(
+            "Invalid function. Use JavaScript syntax like Math.sin(x), x*x, Math.exp(x)"
+          );
+        }
+      }
+
+      function updateExplanation(method) {
+        const box = document.getElementById("methodExplanation");
+
+        if (method === "forward")
+          box.innerText = "Forward Difference: f'(x) ≈ [f(x+h) - f(x)] / h";
+
+        if (method === "backward")
+          box.innerText = "Backward Difference: f'(x) ≈ [f(x) - f(x-h)] / h";
+
+        if (method === "central")
+          box.innerText =
+            "Central Difference: f'(x) ≈ [f(x+h) - f(x-h)] / (2h)";
+
+        if (method === "divided")
+          box.innerText =
+            "Divided Difference: Symmetric difference approximation";
+      }
+
+      calculate();
+    </script>
+  </body>
+</html>
